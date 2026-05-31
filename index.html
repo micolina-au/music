@@ -323,7 +323,24 @@
 </div>
 
 <script>
-  let tracks = [];
+  let tracks = [
+   {
+    id: 1,
+    title: "カルメン",
+    url: "https://www.youtube.com/watch?v=378F-eiFZEE&list=RD378F-eiFZEE&start_radio=1",
+    memo: "オペラ、ビゼーのカルメン",
+    vid: "378F-eiFZEE",
+    open: false
+  },
+  {
+    id: 2,
+    title: "2曲目の曲名",
+    url: "https://www.youtube.com/watch?v=YYYYYYYYYYY",
+    memo: "",
+    vid: "YYYYYYYYYYY",
+    open: false
+  }
+];
 
   function extractVideoId(url) {
     const patterns = [
