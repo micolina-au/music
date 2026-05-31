@@ -54,76 +54,6 @@
     margin: 0 auto;
   }
 
-  .add-form {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 24px;
-    margin-bottom: 32px;
-  }
-
-  .add-form h2 {
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
-
-  .field { margin-bottom: 12px; }
-
-  .field label {
-    display: block;
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 5px;
-  }
-
-  .field input,
-  .field textarea {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 10px 12px;
-    font-family: var(--mono);
-    font-size: 0.82rem;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s;
-    resize: none;
-  }
-
-  .field input:focus,
-  .field textarea:focus { border-color: var(--accent); }
-
-  .field input::placeholder,
-  .field textarea::placeholder { color: #ccc9c0; }
-
-  .btn-add {
-    width: 100%;
-    background: var(--text);
-    color: var(--bg);
-    border: none;
-    padding: 11px;
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.15s;
-    margin-top: 4px;
-  }
-
-  .btn-add:hover { background: var(--accent); }
-
-  .error-msg {
-    font-size: 0.72rem;
-    color: var(--accent);
-    margin-top: 8px;
-    display: none;
-  }
-
   .track-list {
     display: flex;
     flex-direction: column;
@@ -209,7 +139,6 @@
     white-space: pre-wrap;
     border-top: 1px dashed var(--border);
     padding: 10px 18px 12px;
-    margin: 0 0 0 0;
   }
 
   .btn-play {
@@ -219,17 +148,6 @@
   }
 
   .btn-play:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  .empty {
-    text-align: center;
-    padding: 60px 0;
-    color: var(--muted);
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    border: 1px dashed var(--border);
-  }
-
-  .empty span { display: block; font-size: 2rem; margin-bottom: 12px; opacity: 0.4; }
 
   .list-header {
     display: flex;
@@ -263,96 +181,30 @@
 
 <div class="container">
 
-  <div class="add-form">
-    <h2>曲を追加</h2>
-    <div class="field">
-      <label>YouTube URL *</label>
-      <input type="text" id="inp-url" placeholder="https://www.youtube.com/watch?v=...">
-    </div>
-    <div class="field">
-      <label>曲名 *</label>
-      <input type="text" id="inp-title" placeholder="曲名を入力...">
-    </div>
-    <div class="field">
-      <label>メモ（任意）</label>
-      <textarea id="inp-memo" rows="2" placeholder="感想やコメントを..."></textarea>
-    </div>
-    <div id="error-msg" class="error-msg">※ URLと曲名を入力してください</div>
-    <button class="btn-add" onclick="addTrack()">＋ 追加する</button>
-  </div>
-
   <div class="list-header">
     <h2>プレイリスト</h2>
     <span class="count-badge" id="count-badge">0 曲</span>
   </div>
 
-  <div class="track-list" id="track-list">
-    <div class="empty" id="empty-state">
-      <span>♪</span>
-      まだ曲がありません。<br>上のフォームから追加してみましょう。
-    </div>
-  </div>
+  <div class="track-list" id="track-list"></div>
 
 </div>
 
 <script>
-  let tracks = [
+  const tracks = [
     {
       id: 1,
       title: "カルメン",
       url: "https://www.youtube.com/watch?v=378F-eiFZEE&list=RD378F-eiFZEE&start_radio=1",
-      memo: "オペラ、ビゼーのカルメン",
-      vid: "378F-eiFZEE",
-      open: false
+      memo: "オペラ、ビゼーのカルメン"
     },
     {
       id: 2,
       title: "この野原いっぱい",
       url: "https://www.youtube.com/watch?v=BZBbi7bUa3M&list=RDBZBbi7bUa3M&start_radio=1",
-      memo: "1967年（昭和42年）森山良子",
-      vid: "BZBbi7bUa3M",
-      open: false
+      memo: "1967年（昭和42年）森山良子"
     }
   ];
-
-  function extractVideoId(url) {
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/,
-      /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/
-    ];
-    for (const p of patterns) {
-      const m = url.match(p);
-      if (m) return m[1];
-    }
-    return null;
-  }
-
-  function addTrack() {
-    const url   = document.getElementById('inp-url').value.trim();
-    const title = document.getElementById('inp-title').value.trim();
-    const memo  = document.getElementById('inp-memo').value.trim();
-    const err   = document.getElementById('error-msg');
-    const vid   = extractVideoId(url);
-
-    if (!url || !title || !vid) {
-      err.style.display = 'block';
-      err.textContent = !url || !title
-        ? '※ URLと曲名を入力してください'
-        : '※ 有効なYouTube URLを入力してください';
-      return;
-    }
-    err.style.display = 'none';
-    tracks.push({ id: Date.now(), url, title, memo, vid, open: false });
-    document.getElementById('inp-url').value = '';
-    document.getElementById('inp-title').value = '';
-    document.getElementById('inp-memo').value = '';
-    render();
-  }
-
-  function removeTrack(id) {
-    tracks = tracks.filter(t => t.id !== id);
-    render();
-  }
 
   function escHtml(s) {
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -360,45 +212,26 @@
 
   function render() {
     const list  = document.getElementById('track-list');
-    const empty = document.getElementById('empty-state');
     const badge = document.getElementById('count-badge');
 
     badge.textContent = tracks.length + ' 曲';
 
-    if (tracks.length === 0) {
-      list.innerHTML = '';
-      list.appendChild(empty);
-      empty.style.display = 'block';
-      return;
-    }
-
-    empty.style.display = 'none';
-    list.innerHTML = tracks.map((t, i) => {
-      // URLはhref属性に直接使う（escHtmlを使わない）
-      const safeTitle = escHtml(t.title);
-      const safeUrl   = escHtml(t.url);
-      const safeMemo  = escHtml(t.memo);
-      return `
-      <div class="track-card" id="card-${t.id}">
+    list.innerHTML = tracks.map((t, i) => `
+      <div class="track-card">
         <div class="track-header">
           <div class="track-meta">
             <div class="track-index">TRACK ${String(i+1).padStart(2,'0')}</div>
-            <div class="track-title" title="${safeTitle}">${safeTitle}</div>
-            <div class="track-url">${safeUrl}</div>
+            <div class="track-title" title="${escHtml(t.title)}">${escHtml(t.title)}</div>
+            <div class="track-url">${escHtml(t.url)}</div>
           </div>
           <div class="track-actions">
             <a class="btn-icon btn-play" href="${t.url}" target="_blank" rel="noopener" title="YouTubeで開く">▶</a>
-            <button class="btn-icon" title="削除" onclick="removeTrack(${t.id})">✕</button>
           </div>
         </div>
-        ${t.memo ? `<div class="track-memo">${safeMemo}</div>` : ''}
+        ${t.memo ? `<div class="track-memo">${escHtml(t.memo)}</div>` : ''}
       </div>
-      `;
-    }).join('');
+    `).join('');
   }
-
-  document.getElementById('inp-url').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-title').focus(); });
-  document.getElementById('inp-title').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-memo').focus(); });
 
   render();
 </script>
