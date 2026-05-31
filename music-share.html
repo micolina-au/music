@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎵 Music Share</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --border: #e0dbd0;
+    --text: #1a1814;
+    --muted: #9a9489;
+    --accent: #c0392b;
+    --accent-light: #f9ece9;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Shippori Mincho', serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    min-height: 100vh;
+    padding: 48px 16px 80px;
+  }
+
+  header {
+    max-width: 640px;
+    margin: 0 auto 48px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+
+  header h1 {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-bottom: 6px;
+  }
+
+  header p {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* Add form */
+  .add-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+
+  .add-form h2 {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .field {
+    margin-bottom: 12px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    resize: none;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: #ccc9c0;
+  }
+
+  .btn-add {
+    width: 100%;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    padding: 11px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 4px;
+  }
+
+  .btn-add:hover { background: var(--accent); }
+
+  /* Error */
+  .error-msg {
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-top: 8px;
+    display: none;
+  }
+
+  /* Track list */
+  .track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .track-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    animation: fadeIn 0.25s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .track-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+    gap: 12px;
+  }
+
+  .track-meta { flex: 1; min-width: 0; }
+
+  .track-index {
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 3px;
+  }
+
+  .track-title {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+
+  .track-url {
+    font-size: 0.65rem;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.03em;
+  }
+
+  .track-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .btn-icon {
+    background: none;
+    border: 1px solid var(--border);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: var(--muted);
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+
+  .track-memo {
+    font-size: 0.75rem;
+    color: #7a7570;
+    padding: 0 18px 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    border-top: 1px dashed var(--border);
+    padding-top: 10px;
+    margin: 0 18px 12px;
+  }
+
+  .track-embed {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .track-embed.open { display: block; }
+
+  .track-embed iframe {
+    display: block;
+    width: 100%;
+    height: 200px;
+    border: none;
+  }
+
+  .btn-play {
+    background: var(--accent-light);
+    border-color: #e8c5bf;
+    color: var(--accent);
+  }
+
+  .btn-play:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    border: 1px dashed var(--border);
+  }
+
+  .empty span { display: block; font-size: 2rem; margin-bottom: 12px; opacity: 0.4; }
+
+  /* Count */
+  .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .list-header h2 {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .count-badge {
+    font-size: 0.65rem;
+    background: var(--text);
+    color: var(--bg);
+    padding: 2px 8px;
+    letter-spacing: 0.06em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎵 Music Share</h1>
+  <p>YOUTUBE LINKS — SHARED WITH FRIENDS</p>
+</header>
+
+<div class="container">
+
+  <!-- Add Form -->
+  <div class="add-form">
+    <h2>曲を追加</h2>
+    <div class="field">
+      <label>YouTube URL *</label>
+      <input type="text" id="inp-url" placeholder="https://www.youtube.com/watch?v=...">
+    </div>
+    <div class="field">
+      <label>曲名 *</label>
+      <input type="text" id="inp-title" placeholder="曲名を入力...">
+    </div>
+    <div class="field">
+      <label>メモ（任意）</label>
+      <textarea id="inp-memo" rows="2" placeholder="感想やコメントを..."></textarea>
+    </div>
+    <div id="error-msg" class="error-msg">※ URLと曲名を入力してください</div>
+    <button class="btn-add" onclick="addTrack()">＋ 追加する</button>
+  </div>
+
+  <!-- List -->
+  <div class="list-header">
+    <h2>プレイリスト</h2>
+    <span class="count-badge" id="count-badge">0 曲</span>
+  </div>
+
+  <div class="track-list" id="track-list">
+    <div class="empty" id="empty-state">
+      <span>♪</span>
+      まだ曲がありません。<br>上のフォームから追加してみましょう。
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let tracks = [];
+
+  function extractVideoId(url) {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m) return m[1];
+    }
+    return null;
+  }
+
+  function addTrack() {
+    const url   = document.getElementById('inp-url').value.trim();
+    const title = document.getElementById('inp-title').value.trim();
+    const memo  = document.getElementById('inp-memo').value.trim();
+    const err   = document.getElementById('error-msg');
+
+    const vid = extractVideoId(url);
+
+    if (!url || !title || !vid) {
+      err.style.display = 'block';
+      err.textContent = !url || !title
+        ? '※ URLと曲名を入力してください'
+        : '※ 有効なYouTube URLを入力してください';
+      return;
+    }
+    err.style.display = 'none';
+
+    tracks.push({ id: Date.now(), url, title, memo, vid, open: false });
+    document.getElementById('inp-url').value = '';
+    document.getElementById('inp-title').value = '';
+    document.getElementById('inp-memo').value = '';
+    render();
+  }
+
+  function removeTrack(id) {
+    tracks = tracks.filter(t => t.id !== id);
+    render();
+  }
+
+  function toggleEmbed(id) {
+    const t = tracks.find(t => t.id === id);
+    if (t) { t.open = !t.open; render(); }
+  }
+
+  function render() {
+    const list  = document.getElementById('track-list');
+    const empty = document.getElementById('empty-state');
+    const badge = document.getElementById('count-badge');
+
+    badge.textContent = tracks.length + ' 曲';
+
+    if (tracks.length === 0) {
+      list.innerHTML = '';
+      list.appendChild(empty);
+      empty.style.display = 'block';
+      return;
+    }
+
+    empty.style.display = 'none';
+    list.innerHTML = tracks.map((t, i) => `
+      <div class="track-card" id="card-${t.id}">
+        <div class="track-header">
+          <div class="track-meta">
+            <div class="track-index">TRACK ${String(i+1).padStart(2,'0')}</div>
+            <div class="track-title" title="${esc(t.title)}">${esc(t.title)}</div>
+            <div class="track-url">${esc(t.url)}</div>
+          </div>
+          <div class="track-actions">
+            <button class="btn-icon btn-play" title="再生" onclick="toggleEmbed(${t.id})">
+              ${t.open ? '■' : '▶'}
+            </button>
+            <button class="btn-icon" title="削除" onclick="removeTrack(${t.id})">✕</button>
+          </div>
+        </div>
+        ${t.memo ? `<div class="track-memo">${esc(t.memo)}</div>` : ''}
+        <div class="track-embed ${t.open ? 'open' : ''}">
+          ${t.open ? `<iframe src="https://www.youtube.com/embed/${t.vid}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Enter key shortcuts
+  document.getElementById('inp-url').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-title').focus(); });
+  document.getElementById('inp-title').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-memo').focus(); });
+
+  render();
+</script>
+</body>
+</html>
