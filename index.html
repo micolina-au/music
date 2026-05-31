@@ -412,9 +412,7 @@
             <div class="track-url">${esc(t.url)}</div>
           </div>
           <div class="track-actions">
-            <button class="btn-icon btn-play" title="再生" onclick="toggleEmbed(${t.id})">
-              ${t.open ? '■' : '▶'}
-            </button>
+           <a class="btn-icon btn-play" href="${esc(t.url)}" target="_blank" title="YouTubeで開く">▶</a>
             <button class="btn-icon" title="削除" onclick="removeTrack(${t.id})">✕</button>
           </div>
         </div>
