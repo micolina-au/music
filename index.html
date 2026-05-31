@@ -54,7 +54,6 @@
     margin: 0 auto;
   }
 
-  /* Add form */
   .add-form {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -70,9 +69,7 @@
     margin-bottom: 16px;
   }
 
-  .field {
-    margin-bottom: 12px;
-  }
+  .field { margin-bottom: 12px; }
 
   .field label {
     display: block;
@@ -98,14 +95,10 @@
   }
 
   .field input:focus,
-  .field textarea:focus {
-    border-color: var(--accent);
-  }
+  .field textarea:focus { border-color: var(--accent); }
 
   .field input::placeholder,
-  .field textarea::placeholder {
-    color: #ccc9c0;
-  }
+  .field textarea::placeholder { color: #ccc9c0; }
 
   .btn-add {
     width: 100%;
@@ -124,7 +117,6 @@
 
   .btn-add:hover { background: var(--accent); }
 
-  /* Error */
   .error-msg {
     font-size: 0.72rem;
     color: var(--accent);
@@ -132,7 +124,6 @@
     display: none;
   }
 
-  /* Track list */
   .track-list {
     display: flex;
     flex-direction: column;
@@ -206,6 +197,7 @@
     color: var(--muted);
     transition: all 0.15s;
     flex-shrink: 0;
+    text-decoration: none;
   }
 
   .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
@@ -213,26 +205,11 @@
   .track-memo {
     font-size: 0.75rem;
     color: #7a7570;
-    padding: 0 18px 12px;
     line-height: 1.6;
     white-space: pre-wrap;
     border-top: 1px dashed var(--border);
-    padding-top: 10px;
-    margin: 0 18px 12px;
-  }
-
-  .track-embed {
-    display: none;
-    border-top: 1px solid var(--border);
-  }
-
-  .track-embed.open { display: block; }
-
-  .track-embed iframe {
-    display: block;
-    width: 100%;
-    height: 200px;
-    border: none;
+    padding: 10px 18px 12px;
+    margin: 0 0 0 0;
   }
 
   .btn-play {
@@ -243,7 +220,6 @@
 
   .btn-play:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-  /* Empty state */
   .empty {
     text-align: center;
     padding: 60px 0;
@@ -255,7 +231,6 @@
 
   .empty span { display: block; font-size: 2rem; margin-bottom: 12px; opacity: 0.4; }
 
-  /* Count */
   .list-header {
     display: flex;
     align-items: center;
@@ -288,7 +263,6 @@
 
 <div class="container">
 
-  <!-- Add Form -->
   <div class="add-form">
     <h2>曲を追加</h2>
     <div class="field">
@@ -307,7 +281,6 @@
     <button class="btn-add" onclick="addTrack()">＋ 追加する</button>
   </div>
 
-  <!-- List -->
   <div class="list-header">
     <h2>プレイリスト</h2>
     <span class="count-badge" id="count-badge">0 曲</span>
@@ -324,23 +297,23 @@
 
 <script>
   let tracks = [
-   {
-    id: 1,
-    title: "カルメン",
-    url: "https://www.youtube.com/watch?v=378F-eiFZEE&list=RD378F-eiFZEE&start_radio=1",
-    memo: "オペラ、ビゼーのカルメン",
-    vid: "378F-eiFZEE",
-    open: false
-  },
-  {
-    id: 2,
-    title: "この野原いっぱい",
-    url: "https://www.youtube.com/watch?v=BZBbi7bUa3M&list=RDBZBbi7bUa3M&start_radio=1",
-    memo: "1967年（昭和42年）森山良子",
-    vid: "BZBbi7bUa3M",
-    open: false
-  }
-];
+    {
+      id: 1,
+      title: "カルメン",
+      url: "https://www.youtube.com/watch?v=378F-eiFZEE&list=RD378F-eiFZEE&start_radio=1",
+      memo: "オペラ、ビゼーのカルメン",
+      vid: "378F-eiFZEE",
+      open: false
+    },
+    {
+      id: 2,
+      title: "この野原いっぱい",
+      url: "https://www.youtube.com/watch?v=BZBbi7bUa3M&list=RDBZBbi7bUa3M&start_radio=1",
+      memo: "1967年（昭和42年）森山良子",
+      vid: "BZBbi7bUa3M",
+      open: false
+    }
+  ];
 
   function extractVideoId(url) {
     const patterns = [
@@ -359,8 +332,7 @@
     const title = document.getElementById('inp-title').value.trim();
     const memo  = document.getElementById('inp-memo').value.trim();
     const err   = document.getElementById('error-msg');
-
-    const vid = extractVideoId(url);
+    const vid   = extractVideoId(url);
 
     if (!url || !title || !vid) {
       err.style.display = 'block';
@@ -370,7 +342,6 @@
       return;
     }
     err.style.display = 'none';
-
     tracks.push({ id: Date.now(), url, title, memo, vid, open: false });
     document.getElementById('inp-url').value = '';
     document.getElementById('inp-title').value = '';
@@ -383,9 +354,8 @@
     render();
   }
 
-  function toggleEmbed(id) {
-    const t = tracks.find(t => t.id === id);
-    if (t) { t.open = !t.open; render(); }
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   function render() {
@@ -403,32 +373,30 @@
     }
 
     empty.style.display = 'none';
-    list.innerHTML = tracks.map((t, i) => `
+    list.innerHTML = tracks.map((t, i) => {
+      // URLはhref属性に直接使う（escHtmlを使わない）
+      const safeTitle = escHtml(t.title);
+      const safeUrl   = escHtml(t.url);
+      const safeMemo  = escHtml(t.memo);
+      return `
       <div class="track-card" id="card-${t.id}">
         <div class="track-header">
           <div class="track-meta">
             <div class="track-index">TRACK ${String(i+1).padStart(2,'0')}</div>
-            <div class="track-title" title="${esc(t.title)}">${esc(t.title)}</div>
-            <div class="track-url">${esc(t.url)}</div>
+            <div class="track-title" title="${safeTitle}">${safeTitle}</div>
+            <div class="track-url">${safeUrl}</div>
           </div>
           <div class="track-actions">
-           <a class="btn-icon btn-play" href="${esc(t.url)}" target="_blank" title="YouTubeで開く">▶</a>
+            <a class="btn-icon btn-play" href="${t.url}" target="_blank" rel="noopener" title="YouTubeで開く">▶</a>
             <button class="btn-icon" title="削除" onclick="removeTrack(${t.id})">✕</button>
           </div>
         </div>
-        ${t.memo ? `<div class="track-memo">${esc(t.memo)}</div>` : ''}
-        <div class="track-embed ${t.open ? 'open' : ''}">
-          ${t.open ? `<iframe src="https://www.youtube.com/embed/${t.vid}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>` : ''}
-        </div>
+        ${t.memo ? `<div class="track-memo">${safeMemo}</div>` : ''}
       </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
-  function esc(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // Enter key shortcuts
   document.getElementById('inp-url').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-title').focus(); });
   document.getElementById('inp-title').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-memo').focus(); });
 
